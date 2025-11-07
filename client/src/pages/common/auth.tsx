@@ -1,11 +1,22 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import GoogleAuthButton from "@/components/auth/GoogleAuthButton";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/authcontext";
 
 export default function Auth() {
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+
+  if (loading) return <div>Loading...</div>;
+  if (user) {
+    if (user.role === "admin")
+      return <Navigate to="/admin/dashboard" replace />;
+    if (user.role === "student")
+      return <Navigate to="/student/dashboard" replace />;
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,11 +71,7 @@ export default function Auth() {
                 Forgot password?
               </a>
             </div>
-            <Button
-              variant="default"
-              type="submit"
-              className="w-full "
-            >
+            <Button variant="default" type="submit" className="w-full ">
               Sign In
             </Button>
           </form>

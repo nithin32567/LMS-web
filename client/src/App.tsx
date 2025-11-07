@@ -1,10 +1,10 @@
-import Auth from "./pages/common/auth";
+import { BrowserRouter } from "react-router-dom";
+import AppRouter from "./routes/AppRouter";
 
 export default function App() {
   return (
-    <div>
-      {/* <h1>Hello World</h1> */}
-      <Auth />
-    </div>
+    <BrowserRouter>
+      <AppRouter />
+    </BrowserRouter>
   );
 }

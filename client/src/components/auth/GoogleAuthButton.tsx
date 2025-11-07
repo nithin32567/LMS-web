@@ -5,26 +5,16 @@ interface GoogleAuthButtonProps {
   className?: string;
 }
 
-export default function GoogleAuthButton({
-  onClick,
-  className,
-}: GoogleAuthButtonProps) {
+export default function GoogleAuthButton({ className }: GoogleAuthButtonProps) {
   const handleGoogleAuth = () => {
-    if (onClick) {
-      onClick();
-      return;
-    }
-
-    const baseURL = import.meta.env.VITE_URL || "http://localhost:3000";
-    window.location.href = `${baseURL}/api/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   };
-
   return (
     <Button
       type="button"
-      onClick={handleGoogleAuth}
       variant="secondary"
       className={className}
+      onClick={handleGoogleAuth}
     >
       <svg
         className="size-5"

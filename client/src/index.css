@@ -5,6 +5,7 @@
   --color-primary-background: var(--primary-background);
   --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
+  --font-sans: "Lexend", sans-serif;
 }
 
 body {

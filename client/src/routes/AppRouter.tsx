@@ -1,37 +1,34 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import SuperAdminLayout from "../layouts/SuperAdminLayout";
-import TenantLayout from "../layouts/TenantLayout";
-import InstructorLayout from "../layouts/InstructorLayout";
-import StudentLayout from "../layouts/StudentLayout";
-import Login from "../pages/auth/Login";
-import NotFound from "../pages/common/NotFound";
+import { Suspense } from "react";
+import { Routes, Route } from "react-router-dom";
+import { routes } from "./RoutingConfig";
+import type { AppRoute } from "./RoutingConfig";
+import ProtectedRoute from "./ProtectedRoute";
+import type { UserRole } from "./RoutingConfig";
 
 export default function AppRouter() {
-  const { user } = useAuth();
-
-  if (!user) return <Login />;
-
-  const role = user.role;
-
   return (
-    <BrowserRouter>
+    <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        {role === "SUPER_ADMIN" && (
-          <Route path="/superadmin/*" element={<SuperAdminLayout />} />
-        )}
-        {role === "TENANT_ADMIN" && (
-          <Route path="/tenant/*" element={<TenantLayout />} />
-        )}
-        {role === "INSTRUCTOR" && (
-          <Route path="/instructor/*" element={<InstructorLayout />} />
-        )}
-        {role === "STUDENT" && (
-          <Route path="/student/*" element={<StudentLayout />} />
-        )}
+        {routes.map(({ path, element, roles }: AppRoute) => {
+          if (roles) {
+            // Protected route
+            return (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <ProtectedRoute allowedRoles={roles as UserRole[]}>
+                    {element}
+                  </ProtectedRoute>
+                }
+              />
+            );
+          }
 
-        <Route path="*" element={<NotFound />} />
+          // Public route
+          return <Route key={path} path={path} element={element} />;
+        })}
       </Routes>
-    </BrowserRouter>
+    </Suspense>
   );
 }
