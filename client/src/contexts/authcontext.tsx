@@ -1,17 +1,30 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
-import { api } from "@/api/axiosInstance";
+import { api, setUnauthorizedHandler } from "@/api/axiosInstance";
 
 interface DecodedToken {
   sub: string;
   role: string;
   exp: number;
+  name: string;
+  email: string;
+  avatar: string;
 }
 
 interface User {
   id: string;
   role: string;
+  name: string;
+  email: string;
+  avatar: string;
 }
 
 interface AuthContextType {
@@ -37,7 +50,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (res.data.accessToken) {
         const decoded: DecodedToken = jwtDecode(res.data.accessToken);
         setAccessToken(res.data.accessToken);
-        setUser({ id: decoded.sub, role: decoded.role });
+        setUser({
+          id: decoded.sub,
+          role: decoded.role,
+          name: decoded.name,
+          email: decoded.email,
+          avatar: decoded.avatar,
+        });
+        setLoading(false);
+      } else {
+        setAccessToken(null);
+        setUser(null);
         setLoading(false);
       }
     } catch (error) {
@@ -50,23 +73,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     refreshAccessToken();
+
+    const handleUnauthorized = () => {
+      setAccessToken(null);
+      setUser(null);
+      setLoading(false);
+    };
+
+    setUnauthorizedHandler(handleUnauthorized);
+
+    return () => {
+      setUnauthorizedHandler(null);
+    };
   }, []);
 
-  function logout() {
-    setLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-      credentials: "include",
-    });
-    setAccessToken(null);
-    setUser(null);
-    setLoading(false);
-  }
+  const logout = useCallback(async () => {
+    try {
+      await api.post("/auth/logout");
+      setAccessToken(null);
+      setUser(null);
+      setLoading(false);
+    } catch (error) {
+      console.log("error in logout", error);
+      setAccessToken(null);
+      setUser(null);
+      setLoading(false);
+    }
+  }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, accessToken, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, accessToken, logout, loading }),
+    [user, accessToken, logout, loading]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

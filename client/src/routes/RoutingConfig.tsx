@@ -8,6 +8,7 @@ const StudentDashboard = lazy(
 );
 const NotFound = lazy(() => import("./../pages/common/NotFound"));
 const Auth = lazy(() => import("./../pages/common/auth"));
+const Profile = lazy(() => import("./../pages/common/Profile"));
 
 export type UserRole = "admin" | "student" | "instructor";
 
@@ -35,6 +36,11 @@ export const routes: AppRoute[] = [
     path: "/student/dashboard",
     element: <StudentDashboard />,
     roles: ["student"],
+  },
+  {
+    path: "/profile",
+    element: <Profile />,
+    roles: ["admin", "instructor", "student"],
   },
   {
     path: "*",

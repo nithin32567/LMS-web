@@ -4,7 +4,7 @@ import { signAccessToken, signRefreshToken, verifyRefreshToken } from "./jwtServ
 import User from "../models/user.model.ts";
 
 export async function createTokenForUser(user: any) {
-  const accessToken = signAccessToken({ sub: user._id, provider: user.provider, role: user.role });
+  const accessToken = signAccessToken({ sub: user._id, provider: user.provider, role: user.role, name: user.name, email: user.email, avatar: user.avatar });
   const refreshToken = signRefreshToken({ sub: user._id, provider: user.provider, role: user.role });
 
   await RefreshToken.create({ user: user._id, token: refreshToken });

@@ -12,12 +12,12 @@ export default function ProtectedRoute({
   children,
   allowedRoles,
 }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+  const { user, accessToken, loading } = useAuth();
   if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/auth" />;
+  if (!user || !accessToken) return <Navigate to="/auth" replace />;
 
   if (allowedRoles && !allowedRoles.includes(user.role as UserRole))
-    return <Navigate to="/unauthorized" />;
+    return <Navigate to="/unauthorized" replace />;
   
   return children;
 }

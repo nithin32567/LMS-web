@@ -4,17 +4,18 @@ import { routes } from "./RoutingConfig";
 import type { AppRoute } from "./RoutingConfig";
 import ProtectedRoute from "./ProtectedRoute";
 import type { UserRole } from "./RoutingConfig";
+import NavbarWrapper from "@/components/header/Navbar-wrapper";
 
 export default function AppRouter() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
+      <NavbarWrapper />
       <Routes>
-        {routes.map(({ path, element, roles }: AppRoute) => {
+        {routes.map(({ path, element, roles }: AppRoute, index: number) => {
           if (roles) {
-            // Protected route
             return (
               <Route
-                key={path}
+                key={`${path}-${index}`}
                 path={path}
                 element={
                   <ProtectedRoute allowedRoles={roles as UserRole[]}>
@@ -25,8 +26,9 @@ export default function AppRouter() {
             );
           }
 
-          // Public route
-          return <Route key={path} path={path} element={element} />;
+          return (
+            <Route key={`${path}-${index}`} path={path} element={element} />
+          );
         })}
       </Routes>
     </Suspense>
