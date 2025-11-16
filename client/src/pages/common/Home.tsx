@@ -1,5 +1,10 @@
+import CommonNavbar from "./CommonNavbar";
+
 export default function Home() {
   return (
-    <div>Home</div>
+    <>
+      <CommonNavbar />
+      <div>Home</div>
+    </>
   );
 }

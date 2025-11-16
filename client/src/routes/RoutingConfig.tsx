@@ -7,7 +7,7 @@ const StudentDashboard = lazy(
   () => import("./../pages/student/student-dashboard")
 );
 const NotFound = lazy(() => import("./../pages/common/NotFound"));
-const Auth = lazy(() => import("./../pages/common/auth"));
+const Auth = lazy(() => import("../pages/common/signup"));
 const Profile = lazy(() => import("./../pages/common/Profile"));
 
 export type UserRole = "admin" | "student" | "instructor";

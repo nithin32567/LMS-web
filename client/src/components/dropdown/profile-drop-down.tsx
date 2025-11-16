@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,17 +19,25 @@ export function ProfileDropDown() {
       <DropdownMenuTrigger asChild>
         <div
           onMouseEnter={() => setOpen(true)}
-          className="w-10 h-10 rounded-full overflow-hidden"
+          className="w-10 h-10 rounded-full overflow-hidden bg-gray-300 flex items-center justify-center"
         >
-          <img
-            src={user.avatar}
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
+          {user.avatar ? (
+            <img
+              src={user.avatar}
+              alt="avatar"
+              className="w-full h-full object-cover"
+              crossOrigin="anonymous"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <span className="text-gray-600 font-semibold text-sm">
+              {user.name?.charAt(0).toUpperCase() || "U"}
+            </span>
+          )}
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuGroup>
+      <DropdownMenuContent className="pl-6" align="end">
+        <DropdownMenuGroup className="w-full">
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => navigate("/profile")}
@@ -37,8 +45,19 @@ export function ProfileDropDown() {
             Profile
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuGroup className="w-full">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate("/profile")}
+          >
+            Start teaching
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
 
-        <DropdownMenuItem className="cursor-pointer" onClick={() => logout()}>
+        <DropdownMenuItem
+          className="cursor-pointer justify-end"
+          onClick={() => logout()}
+        >
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

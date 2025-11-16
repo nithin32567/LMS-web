@@ -7,7 +7,7 @@ interface IRole extends Document {
 }
 
 const roleSchema = new Schema<IRole>({
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, enum: ["admin", "instructor", "student"] },
     permissions: { type: [Schema.Types.ObjectId], ref: Permission, required: true },
 });
 

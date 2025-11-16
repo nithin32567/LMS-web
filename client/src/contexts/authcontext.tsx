@@ -32,6 +32,7 @@ interface AuthContextType {
   accessToken: string | null;
   logout: () => void;
   loading: boolean;
+  setAuthData: (token: string, userData: DecodedToken) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -87,6 +88,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const setAuthData = useCallback((token: string, userData: DecodedToken) => {
+    setAccessToken(token);
+    setUser({
+      id: userData.sub,
+      role: userData.role,
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar,
+    });
+    setLoading(false);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await api.post("/auth/logout");
@@ -102,8 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, accessToken, logout, loading }),
-    [user, accessToken, logout, loading]
+    () => ({ user, accessToken, logout, loading, setAuthData }),
+    [user, accessToken, logout, loading, setAuthData]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
