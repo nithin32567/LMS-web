@@ -18,6 +18,6 @@ export default function ProtectedRoute({
 
   if (allowedRoles && !allowedRoles.includes(user.role as UserRole))
     return <Navigate to="/unauthorized" replace />;
-  
+
   return children;
 }

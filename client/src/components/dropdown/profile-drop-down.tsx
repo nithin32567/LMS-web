@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import { useState } from "react";
 
 export function ProfileDropDown() {
   const { user, logout } = useAuth();
+  // console.log(user);
   if (!user) return null;
   const navigate = useNavigate();
   const [open, setOpen] = useState<boolean>(false);
@@ -46,12 +47,20 @@ export function ProfileDropDown() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuGroup className="w-full">
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={() => navigate("/profile")}
+          <Link
+            to={
+              user.role === "student"
+                ? "/instructor/dashboard"
+                : "/student/dashboard"
+            }
           >
-            Start teaching
-          </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/profile")}
+            >
+              {user.role === "student" ? "Start teaching" : "Student View"}
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
 
         <DropdownMenuItem
