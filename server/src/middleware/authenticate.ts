@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "../services/jwtServices.ts";
+import { verifyRefreshToken } from "../services/jwtServices.ts";
 import Role from "../models/role.model.ts";
 import RolePermission from "../models/role-permisstion.ts";
 
@@ -11,7 +11,7 @@ export default function authenticate(permissions: string[] = []) {
         res.status(401).json({ message: "Unauthorized" });
         return;
       }
-      const payload = verifyAccessToken(token) as any;
+      const payload = verifyRefreshToken(token) as any;
       if (!payload) {
         res.status(401).json({ message: "Unauthorized" });
         return;

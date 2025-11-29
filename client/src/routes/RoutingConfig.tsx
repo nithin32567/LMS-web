@@ -3,6 +3,7 @@ import { lazy } from "react";
 import type { JSX } from "react";
 
 const AdminDashboard = lazy(() => import("./../pages/admin/admin-dashboard"));
+const AdminLogin = lazy(() => import("./../pages/admin/login"));
 const StudentDashboard = lazy(
   () => import("./../pages/student/student-dashboard")
 );
@@ -25,6 +26,10 @@ export const routes: AppRoute[] = [
   {
     path: "/",
     element: <Home />,
+  },
+  {
+    path: "/admin/auth",
+    element: <AdminLogin />,
   },
   {
     path: "/auth",

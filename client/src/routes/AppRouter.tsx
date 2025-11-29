@@ -9,7 +9,12 @@ import NavbarWrapper from "@/components/header/Navbar-wrapper";
 export default function AppRouter() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <NavbarWrapper />
+
+      {window.location.pathname.includes("/admin/auth") ? (
+        <></>
+      ) : (
+        <NavbarWrapper />
+      )}
       <Routes>
         {routes.map(({ path, element, roles }: AppRoute, index: number) => {
           if (roles) {
