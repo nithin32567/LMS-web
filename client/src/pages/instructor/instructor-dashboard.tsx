@@ -32,6 +32,7 @@ interface ProfileLinksData {
 const InstructorDashboard = () => {
   const [step, setStep] = useState<number>(1);
   const [profileCompleted, setProfileCompleted] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [titleData, setTitleData] = useState<ProfileTitleData | null>(null);
   const [expertiseData, setExpertiseData] = useState<ProfileExpertiseData | null>(null);
   useEffect(() => {
@@ -45,6 +46,8 @@ const InstructorDashboard = () => {
         if (error.response?.status === 404) {
           setProfileCompleted(false);
         }
+      } finally {
+        setLoading(false);
       }
     };
     checkProfile();
@@ -65,6 +68,9 @@ const InstructorDashboard = () => {
       console.log("error in handleFinish", error);
     }
   };
+  if (loading) {
+    return null;
+  }
   if (profileCompleted) {
     return (
       <div className="w-full max-w-2xl mx-auto px-4 py-8">

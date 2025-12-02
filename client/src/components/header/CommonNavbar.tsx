@@ -33,9 +33,17 @@ const CommonNavbar = () => {
         user?.role === "student"
           ? "/student/dashboard"
           : user?.role === "instructor"
-          ? "/instructor/dashboard"
-          : "/admin/dashboard",
+            ? "/instructor/dashboard"
+            : "/admin/dashboard",
     },
+    ...(user?.role === "instructor"
+      ? [
+        {
+          label: "Create Course",
+          to: "/instructor/create-course",
+        },
+      ]
+      : []),
   ];
 
   let links = user ? [...commonLinks] : commonLinks;

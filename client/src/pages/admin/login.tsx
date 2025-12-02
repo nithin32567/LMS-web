@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 import { api } from '../../api/axiosInstance';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/authcontext';
 
 interface AdminLoginFormState {
   email: string;
   password: string;
 }
 
+interface DecodedToken {
+  sub: string;
+  role: string;
+  exp: number;
+  name: string;
+  email: string;
+  avatar: string;
+}
+
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
+  const { user, loading, setAuthData } = useAuth();
   const [formState, setFormState] = useState<AdminLoginFormState>({
     email: 'admin123@gmail.com',
     password: '',
   });
+
+  useEffect(() => {
+    if (!loading && user && user.role === 'admin') {
+      navigate('/admin/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -34,11 +52,27 @@ const AdminLogin: React.FC = () => {
       });
 
       console.log('Admin login response', response.data);
-      navigate('/admin/dashboard');
+      if (response.data.accessToken) {
+        const decoded: DecodedToken = jwtDecode(response.data.accessToken);
+        setAuthData(response.data.accessToken, decoded);
+        navigate('/admin/dashboard');
+      }
     } catch (error: any) {
       console.log('Admin login error', error.response?.data || error.message);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (user && user.role === 'admin') {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">

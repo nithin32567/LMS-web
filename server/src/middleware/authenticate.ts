@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyRefreshToken } from "../services/jwtServices.ts";
-import Role from "../models/role.model.ts";
-import RolePermission from "../models/role-permisstion.ts";
 
-export default function authenticate(permissions: string[] = []) {
+export default function authenticate(allowedRoles: string[] = []) {
   return async function (req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.cookies.jid;
@@ -18,27 +16,21 @@ export default function authenticate(permissions: string[] = []) {
       }
       console.log(payload, "payload");
       req.user = payload;
-      if (permissions.length === 0) {
+      if (allowedRoles.length === 0) {
         next();
         return;
       }
-      const role = await Role.findOne({ name: payload.role });
-      if (!role) {
-        res.status(401).json({ message: "Unauthorized" });
+      const userRole = payload.role;
+      if (!userRole) {
+        res.status(401).json({ message: "Unauthorized: Role not found" });
         return;
       }
-      const rolePermissions = await RolePermission
-        .find({ role: role._id })
-        .populate("permission");
-      const userPermNames = rolePermissions.map((rp: any) => rp.permission.name);
-      const hasAll = permissions.every(p =>
-        userPermNames.includes(p)
-      );
-      if (!hasAll) {
+      const hasRole = allowedRoles.includes(userRole);
+      if (!hasRole) {
         res.status(403).json({
-          message: "Forbidden: Missing required permissions",
-          required: permissions,
-          userHas: userPermNames,
+          message: "Forbidden: Insufficient role privileges",
+          required: allowedRoles,
+          userRole: userRole,
         });
         return;
       }

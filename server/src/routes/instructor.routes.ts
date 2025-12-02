@@ -5,7 +5,10 @@ const router = Router();
 
 router.post("/profile", authenticate([]), createProfile);
 router.get("/profile", authenticate([
-    
+
 ]), getProfile);
+
+
+
 
 export default router;

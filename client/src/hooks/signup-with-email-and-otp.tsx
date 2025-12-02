@@ -1,7 +1,8 @@
 import { api } from "@/api/axiosInstance";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/authcontext";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 interface DecodedToken {
   sub: string;
@@ -13,10 +14,31 @@ interface DecodedToken {
 }
 
 export default function useSignupWithEmailAndOtp(email: string, name: string) {
-  const { setAuthData } = useAuth();
+  const { setAuthData, user, accessToken, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [otpSent, setOtpSent] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (user && accessToken) {
+      switch (user.role) {
+        case "admin":
+          navigate("/admin/dashboard", { replace: true });
+          break;
+        case "student":
+          navigate("/student/dashboard", { replace: true });
+          break;
+        case "instructor":
+          navigate("/instructor/dashboard", { replace: true });
+          break;
+        default:
+          break;
+      }
+    }
+  }, [user, accessToken, authLoading, navigate]);
   const handleSignupWithEmailAndOtp = async () => {
     setLoading(true);
     setError("");

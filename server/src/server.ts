@@ -8,15 +8,14 @@ import passport from "./services/passport.ts";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { CLIENT_URL } from "./config/index.ts";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const app = express();
 
-app.use(helmet());
-app.use(cookieParser());
-
-
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const corsOptions = {
   origin: ["http://localhost:5173", CLIENT_URL, "https://your-production-domain.com"],
@@ -31,6 +30,19 @@ const corsOptions = {
   ],
 };
 app.use(cors(corsOptions));
+
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            imgSrc: ["'self'", "http://localhost:5000", "data:", "blob:"],
+        },
+    },
+}));
+app.use(cookieParser());
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use(morgan("dev"));
 passport.initialize();
 
