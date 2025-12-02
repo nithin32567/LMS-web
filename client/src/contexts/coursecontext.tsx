@@ -16,6 +16,24 @@ interface CourseFormData {
   category: string;
 }
 
+interface Lesson {
+  _id: string;
+  title: string;
+  description: string;
+  content: string;
+  order: number;
+  duration?: number;
+  videoUrl?: string;
+}
+
+interface Module {
+  _id: string;
+  title: string;
+  description: string;
+  order: number;
+  lessons: Lesson[];
+}
+
 interface Course {
   _id: string;
   title: string;
@@ -24,11 +42,16 @@ interface Course {
   average_duration: number;
   imageurl?: string;
   category: Category | string;
-  modules: string[];
-  lessons: string[];
+  modules: string[] | Module[];
+  lessons: string[] | Lesson[];
   modulesCount?: number;
   lessonsCount?: number;
   createdAt: string;
+}
+
+interface CourseDetails extends Omit<Course, 'modules' | 'lessons'> {
+  modules: Module[];
+  lessons: Lesson[];
 }
 
 interface Pagination {
@@ -52,6 +75,7 @@ interface CourseContextType {
   categoryLoading: boolean;
   fetchCategories: () => Promise<void>;
   fetchCourses: (page?: number, limit?: number) => Promise<void>;
+  fetchCourseById: (courseId: string) => Promise<CourseDetails>;
   createCategory: (categoryData: { name: string; description: string }) => Promise<Category>;
   createCourse: (courseData: CourseFormData, imageFile: File | null) => Promise<void>;
 }
@@ -121,6 +145,23 @@ export function CourseProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const fetchCourseById = useCallback(async (courseId: string): Promise<CourseDetails> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.get<{ course: CourseDetails }>(`/courses/${courseId}`);
+      return response.data.course;
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Failed to fetch course details';
+      setError(errorMessage);
+      console.log('Error fetching course details:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const createCourse = useCallback(async (courseData: CourseFormData, imageFile: File | null) => {
     setLoading(true);
     setError(null);
@@ -169,6 +210,7 @@ export function CourseProvider({ children }: { children: ReactNode }) {
         categoryLoading,
         fetchCategories,
         fetchCourses,
+        fetchCourseById,
         createCategory,
         createCourse,
       }}
@@ -185,4 +227,6 @@ export function useCourse() {
   }
   return context;
 }
+
+export type { CourseDetails, Module, Lesson };
 

@@ -1,66 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '@/api/axiosInstance';
 import { VideoSection } from '@/components/course/course-details/video-section';
 import { ModuleLessonSection } from '@/components/course/course-details/module-section';
-
-interface Category {
-  _id: string;
-  name: string;
-  description?: string;
-}
-
-interface Lesson {
-  _id: string;
-  title: string;
-  description: string;
-  content: string;
-  order: number;
-  duration?: number;
-  videoUrl?: string;
-}
-
-interface Module {
-  _id: string;
-  title: string;
-  description: string;
-  order: number;
-  lessons: Lesson[];
-}
-
-interface Course {
-  _id: string;
-  title: string;
-  heading: string;
-  description: string;
-  average_duration: number;
-  imageurl?: string;
-  category: Category | string;
-  modules: Module[];
-  lessons: Lesson[];
-  createdAt: string;
-}
+import { useCourse, type CourseDetails, type Lesson, type Module } from '@/contexts/coursecontext';
 
 const CourseDetails = () => {
   const { courseId } = useParams<{ courseId: string }>();
-  const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const { fetchCourseById, loading, error } = useCourse();
+  const [course, setCourse] = useState<CourseDetails | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
 
-  useEffect(() => {
-    if (courseId) {
-      fetchCourseDetails();
-    }
-  }, [courseId]);
+  const fetchCourseDetails = useCallback(async () => {
+    if (!courseId) return;
 
-  const fetchCourseDetails = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const response = await api.get(`/courses/${courseId}`);
-      const courseData = response.data.course;
+      const courseData = await fetchCourseById(courseId);
       setCourse(courseData);
 
       if (courseData.modules && Array.isArray(courseData.modules)) {
@@ -98,13 +53,16 @@ const CourseDetails = () => {
           setSelectedLesson(firstLesson);
         }
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch course details');
+    } catch (err) {
       console.log('Error fetching course details:', err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [courseId, fetchCourseById]);
+
+  useEffect(() => {
+    if (courseId) {
+      fetchCourseDetails();
+    }
+  }, [courseId, fetchCourseDetails]);
 
   const handleLessonClick = (lesson: Lesson) => {
     setSelectedLesson(lesson);
@@ -127,24 +85,26 @@ const CourseDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{course.title}</h1>
-          <p className="text-lg text-foreground/70 mb-4">{course.heading}</p>
-          {typeof course.category === 'object' && (
-            <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
-              {course.category.name}
-            </span>
-          )}
+    <div className="min-h-screen">
+      <div className=" mx-auto px-4">
+        <div className="mb-6 space-y-2">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-2xl font-bold text-foreground">{course.title}</h1>
+            {typeof course.category === 'object' && (
+              <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                {course.category.name}
+              </span>
+            )}
+          </div>
+          <p className="text-base text-foreground/70 leading-relaxed">{course.heading}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        <div className="flex w-full justify-between gap-2">
+          <div className="w-[70%]">
             <VideoSection selectedLesson={selectedLesson} />
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="w-[30%]">
             <ModuleLessonSection
               modules={modules}
               selectedLesson={selectedLesson}

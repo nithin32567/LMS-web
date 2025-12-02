@@ -6,16 +6,26 @@ interface AccordionItemProps {
   title: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
-export const AccordionItem = ({ title, children, defaultOpen = false }: AccordionItemProps) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+export const AccordionItem = ({ title, children, defaultOpen = false, isOpen: controlledIsOpen, onToggle }: AccordionItemProps) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle();
+    } else {
+      setInternalIsOpen(!internalIsOpen);
+    }
+  };
 
   return (
     <div className="border border-border rounded-md overflow-hidden">
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="w-full px-4 py-3 flex items-center justify-between bg-background hover:bg-accent transition-colors"
       >
         <span className="text-sm font-medium text-foreground">{title}</span>
