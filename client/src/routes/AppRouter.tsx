@@ -9,7 +9,9 @@ import NavbarWrapper from "@/components/header/Navbar-wrapper";
 const renderRoute = (route: AppRoute, index: number): React.ReactNode => {
   const { path, index: isIndex, element, roles, children } = route;
 
+
   if (children && children.length > 0) {
+    console.log(children, "children");
     if (roles) {
       return (
         <Route

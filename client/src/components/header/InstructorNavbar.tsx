@@ -22,6 +22,7 @@ const InstructorNavbar = () => {
             label: 'Create Course',
             to: '/instructor/create-course',
         },
+      
     ];
 
     return (

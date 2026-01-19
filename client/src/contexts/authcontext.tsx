@@ -32,7 +32,7 @@ interface AuthContextType {
   accessToken: string | null;
   logout: () => void;
   loading: boolean;
-  setAuthData: (token: string, userData: DecodedToken) => void;
+  refreshAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   console.log("accessToken in authcontext", accessToken);
   console.log("user in authcontext", user);
 
-  async function refreshAccessToken() {
+  const refreshAuth = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.post("/auth/refresh");
@@ -58,22 +58,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: decoded.email,
           avatar: decoded.avatar,
         });
-        setLoading(false);
       } else {
         setAccessToken(null);
         setUser(null);
-        setLoading(false);
       }
     } catch (error) {
       console.log("error in refreshAccessToken", error);
       setAccessToken(null);
       setUser(null);
+    } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    refreshAccessToken();
+    refreshAuth();
 
     const handleUnauthorized = () => {
       setAccessToken(null);
@@ -86,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       setUnauthorizedHandler(null);
     };
-  }, []);
+  }, [refreshAuth]);
 
   const setAuthData = useCallback((token: string, userData: DecodedToken) => {
     setAccessToken(token);
@@ -115,8 +114,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, accessToken, logout, loading, setAuthData }),
-    [user, accessToken, logout, loading, setAuthData]
+    () => ({ user, accessToken, logout, loading, setAuthData, refreshAuth }),
+    [user, accessToken, logout, loading, setAuthData, refreshAuth]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

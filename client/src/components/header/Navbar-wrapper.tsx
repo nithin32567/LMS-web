@@ -16,7 +16,7 @@ const NavbarWrapper = () => {
     return null;
   }
 
-  if (isInstructorPage && user.role === "instructor") {
+  if (isInstructorPage) {
     return null;
   }
 

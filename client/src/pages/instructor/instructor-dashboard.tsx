@@ -1,5 +1,6 @@
 import { useEffect, useState, lazy } from "react";
 import { api } from "@/api/axiosInstance";
+import { useAuth } from "@/contexts/authcontext";
 const ProfileTitle1 = lazy(
   () => import("@/components/instructor/profile-title-1")
 );
@@ -35,6 +36,8 @@ const InstructorDashboard = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [titleData, setTitleData] = useState<ProfileTitleData | null>(null);
   const [expertiseData, setExpertiseData] = useState<ProfileExpertiseData | null>(null);
+  const { refreshAuth } = useAuth();
+
   useEffect(() => {
     const checkProfile = async () => {
       try {
@@ -63,6 +66,7 @@ const InstructorDashboard = () => {
         ...linksData,
       };
       await api.post("/instructor/profile", payload);
+      await refreshAuth();
       setProfileCompleted(true);
     } catch (error) {
       console.log("error in handleFinish", error);

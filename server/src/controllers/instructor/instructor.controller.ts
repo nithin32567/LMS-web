@@ -27,7 +27,7 @@ export const createProfile = async (req: Request, res: Response) => {
             language,
             bio,
             skills,
-            experience,
+            experience: String(experience),
             website,
             youtube,
             twitter,
@@ -38,6 +38,10 @@ export const createProfile = async (req: Request, res: Response) => {
             domainOfExpertise,
             teachingExperience
         });
+
+        // Update user role to instructor
+        await User.findByIdAndUpdate(user.sub, { role: "instructor" });
+
         res.status(201).json({ message: "Profile created successfully", instructor });
         return;
 

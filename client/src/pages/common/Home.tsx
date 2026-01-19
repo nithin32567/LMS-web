@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       <CommonNavbar />
-      <div>Home</div>
+      <div>Landing Page</div>
     </>
   );
 }

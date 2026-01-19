@@ -41,7 +41,7 @@ export function ProfileDropDown() {
         <DropdownMenuGroup className="w-full">
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(user.role === "instructor" ? "/instructor/profile" : "/profile")}
           >
             Profile
           </DropdownMenuItem>

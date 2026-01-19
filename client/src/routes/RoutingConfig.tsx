@@ -34,6 +34,9 @@ const CreateModuleLesson = lazy(
 const CourseDetails = lazy(
   () => import("./../pages/common/Course-details")
 );
+const InstructorProfile = lazy(
+  () => import("./../pages/instructor/Intstructor-profile")
+);
 
 export type UserRole = "admin" | "student" | "instructor";
 
@@ -111,7 +114,7 @@ export const routes: AppRoute[] = [
   {
     path: "/instructor",
     element: <InstructorDashboardWrapper />,
-    roles: ["instructor"],
+    roles: ["instructor", "student"],
     children: [
       {
         index: true,
@@ -120,7 +123,7 @@ export const routes: AppRoute[] = [
       {
         path: "dashboard",
         element: <InstructorDashboard />,
-        roles: ["instructor"],
+        roles: ["instructor", "student"],
       },
       {
         path: "my-courses",
@@ -135,6 +138,11 @@ export const routes: AppRoute[] = [
       {
         path: "course/:courseId/modules-lessons",
         element: <CreateModuleLesson />,
+        roles: ["instructor"],
+      },
+      {
+        path: "profile",
+        element: <InstructorProfile />,
         roles: ["instructor"],
       },
     ],
